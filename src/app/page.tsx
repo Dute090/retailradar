@@ -92,7 +92,7 @@ export default function Home() {
       </header>
 
       {/* Content */}
-      <main className="max-w-lg mx-auto px-4 py-4 space-y-3 pb-24">
+      <main className="max-w-lg mx-auto px-4 py-4 space-y-3 pb-32">
 
         {/* Loading skeletons */}
         {loading && (
@@ -181,7 +181,7 @@ export default function Home() {
       </main>
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-10 shadow-[0_-1px_8px_rgba(0,0,0,0.06)]">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-10 shadow-[0_-1px_8px_rgba(0,0,0,0.06)] pb-safe">
         <div className="max-w-lg mx-auto flex">
           <button className="flex-1 py-3 flex flex-col items-center gap-0.5 text-blue-600">
             <MapPin size={20} />
