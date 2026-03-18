@@ -2,27 +2,26 @@
 
 import { usePlaces } from "@/hooks/usePlaces";
 import { StoreCard } from "@/components/StoreCard";
-import { MapPin, RotateCcw, Search, Sparkles, X } from "lucide-react";
+import { MapPin, Search, Sparkles, X, RotateCcw } from "lucide-react";
 import { useState, useMemo } from "react";
 
 const FREE_LIMIT = 10;
 
-function SkeletonCard() {
+function SkeletonRow() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden animate-pulse" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
-      <div className="h-1 bg-gray-100" />
-      <div className="p-4 flex gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-gray-100 flex-shrink-0" />
-        <div className="flex-1 space-y-2.5 pt-1">
-          <div className="h-2.5 bg-gray-100 rounded w-16" />
-          <div className="h-4 bg-gray-200 rounded w-3/4" />
-          <div className="h-3 bg-gray-100 rounded w-1/2" />
-          <div className="h-3 bg-gray-100 rounded w-full" />
-          <div className="h-3 bg-gray-100 rounded w-1/3" />
-        </div>
+    <div className="flex items-center gap-4 px-4 py-4 bg-white animate-pulse">
+      <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="h-3.5 bg-gray-100 rounded-full w-2/3" />
+        <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+        <div className="h-3 bg-gray-100 rounded-full w-3/4" />
       </div>
     </div>
   );
+}
+
+function Divider() {
+  return <div className="h-px bg-gray-100 ml-20" />;
 }
 
 export default function Home() {
@@ -43,91 +42,94 @@ export default function Home() {
   ).length;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F5F7FA" }}>
+    <div className="min-h-screen bg-gray-50">
 
-      {/* Header */}
-      <header className="bg-white sticky top-0 z-20" style={{ boxShadow: "0 1px 0 #E5E7EB" }}>
-        <div className="max-w-lg mx-auto px-4 pt-5 pb-3">
-          {/* Brand */}
-          <div className="flex items-center justify-between mb-3">
+      {/* Header — Apple Settings style */}
+      <header className="bg-gray-50 sticky top-0 z-20 pt-safe">
+        <div className="max-w-lg mx-auto px-4 pt-6 pb-2">
+          {/* Title row */}
+          <div className="flex items-end justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-                Retail<span style={{ color: "#2563EB" }}>Radar</span>
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                Nearby Stores
               </h1>
               {location?.city ? (
-                <div className="flex items-center gap-1 mt-0.5">
-                  <MapPin size={12} style={{ color: "#2563EB" }} />
+                <div className="flex items-center gap-1 mt-1">
+                  <MapPin size={12} className="text-blue-500" />
                   <span className="text-sm text-gray-500">
-                    Near <span className="font-semibold text-gray-700">{location.city}</span>
+                    {location.city}
                   </span>
                   {!loading && openCount > 0 && (
-                    <span className="ml-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      {openCount} open
-                    </span>
+                    <>
+                      <span className="text-gray-300 mx-1">·</span>
+                      <span className="text-sm text-emerald-600 font-medium">{openCount} open</span>
+                    </>
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400 mt-0.5">Detecting your location…</p>
+                <p className="text-sm text-gray-400 mt-1">Locating…</p>
               )}
             </div>
             <button
               onClick={refetch}
               disabled={loading}
-              className="w-10 h-10 rounded-2xl flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors disabled:opacity-30"
-              style={{ backgroundColor: "#F5F7FA" }}
+              className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-gray-400 hover:text-blue-500 transition-colors disabled:opacity-30 shadow-sm border border-gray-100"
               aria-label="Refresh"
             >
-              <RotateCcw size={17} className={loading ? "animate-spin" : ""} />
+              <RotateCcw size={15} className={loading ? "animate-spin" : ""} />
             </button>
           </div>
 
-          {/* Search */}
-          <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          {/* Search bar — iOS style */}
+          <div className="relative mb-3">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search stores…"
+              placeholder="Search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-10 py-3 rounded-2xl text-[15px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              style={{ backgroundColor: "#F5F7FA", border: "1.5px solid #E5E7EB" }}
+              className="w-full pl-9 pr-9 py-2.5 bg-white rounded-xl text-[15px] text-gray-800 placeholder:text-gray-400 focus:outline-none border border-gray-200 focus:border-blue-400 transition-colors"
             />
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center"
               >
-                <X size={16} />
+                <X size={11} className="text-white" />
               </button>
             )}
           </div>
         </div>
       </header>
 
-      {/* Main */}
-      <main className="max-w-lg mx-auto px-4 pt-4 pb-32 space-y-3">
+      {/* Content */}
+      <main className="max-w-lg mx-auto px-4 pb-32 space-y-6">
 
         {/* Loading */}
         {loading && (
-          <>
-            <p className="text-sm text-gray-400 px-1 py-1">Finding stores near you…</p>
-            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
-          </>
+          <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
+            {[...Array(4)].map((_, i) => (
+              <div key={i}>
+                <SkeletonRow />
+                {i < 3 && <Divider />}
+              </div>
+            ))}
+          </div>
         )}
 
         {/* Error */}
         {!loading && error && (
-          <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
-            <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3">
-              <MapPin size={24} className="text-red-400" />
+          <div className="bg-white rounded-2xl p-8 text-center border border-gray-100">
+            <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+              <MapPin size={22} className="text-gray-400" />
             </div>
-            <p className="font-semibold text-gray-800">Location unavailable</p>
-            <p className="text-sm text-gray-400 mt-1 leading-relaxed">{error}</p>
+            <p className="font-semibold text-gray-800 text-[15px]">Location unavailable</p>
+            <p className="text-sm text-gray-400 mt-1 leading-relaxed max-w-xs mx-auto">{error}</p>
             <button
               onClick={refetch}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 rounded-2xl transition-colors"
+              className="mt-5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
             >
-              Try again
+              Try Again
             </button>
           </div>
         )}
@@ -135,34 +137,41 @@ export default function Home() {
         {/* Results */}
         {!loading && !error && visible.length > 0 && (
           <>
-            <p className="text-xs font-medium text-gray-400 px-1">
-              {filtered.length} store{filtered.length !== 1 ? "s" : ""} nearby
-            </p>
+            {/* Section label */}
+            <div>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2">
+                {filtered.length} store{filtered.length !== 1 ? "s" : ""} nearby
+              </p>
 
-            {visible.map((place) => (
-              <StoreCard key={place.id} place={place} />
-            ))}
+              {/* Card group — iOS grouped list */}
+              <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
+                {visible.map((place, i) => (
+                  <div key={place.id}>
+                    <StoreCard place={place} />
+                    {i < visible.length - 1 && <Divider />}
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Pro upsell */}
             {hasMore && (
-              <div
-                className="rounded-2xl p-5 text-white overflow-hidden relative"
-                style={{ background: "linear-gradient(135deg, #1d4ed8 0%, #2563EB 60%, #3b82f6 100%)" }}
-              >
-                <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/10" />
-                <div className="absolute -bottom-8 -left-4 w-24 h-24 rounded-full bg-white/5" />
-                <div className="relative">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Sparkles size={14} className="text-yellow-300" />
-                    <span className="text-xs font-bold text-blue-200 uppercase tracking-widest">Pro</span>
+              <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
+                <div className="px-4 py-5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      <Sparkles size={20} className="text-blue-500" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 text-[15px]">
+                        {filtered.length - FREE_LIMIT} more stores nearby
+                      </p>
+                      <p className="text-sm text-gray-400 mt-0.5 leading-relaxed">
+                        Upgrade to see all stores, filter by open now, save favorites, and get holiday alerts.
+                      </p>
+                    </div>
                   </div>
-                  <p className="font-bold text-lg leading-tight">
-                    {filtered.length - FREE_LIMIT} more stores nearby
-                  </p>
-                  <p className="text-blue-200 text-sm mt-1 leading-relaxed">
-                    Unlock all stores, open-now filter, favorites & holiday alerts.
-                  </p>
-                  <button className="mt-4 w-full bg-white text-blue-700 font-bold text-sm py-3 rounded-2xl hover:bg-blue-50 transition-colors">
+                  <button className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold text-[15px] py-3 rounded-xl transition-colors">
                     Upgrade to Pro · $2.99/mo
                   </button>
                 </div>
@@ -173,15 +182,15 @@ export default function Home() {
 
         {/* Empty */}
         {!loading && !error && places.length === 0 && (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center mx-auto mb-4" style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
-              <MapPin size={32} className="text-gray-300" />
+          <div className="bg-white rounded-2xl p-10 text-center border border-gray-100">
+            <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+              <MapPin size={22} className="text-gray-300" />
             </div>
-            <p className="font-semibold text-gray-600">No stores found nearby</p>
-            <p className="text-sm text-gray-400 mt-1">Try refreshing or expanding your area.</p>
+            <p className="font-semibold text-gray-700">No stores found</p>
+            <p className="text-sm text-gray-400 mt-1">Try refreshing or moving to a different area.</p>
             <button
               onClick={refetch}
-              className="mt-4 text-sm font-semibold text-blue-600 border border-blue-200 px-5 py-2.5 rounded-2xl hover:bg-blue-50 transition-colors"
+              className="mt-4 text-blue-500 text-sm font-semibold"
             >
               Refresh
             </button>
@@ -189,23 +198,20 @@ export default function Home() {
         )}
       </main>
 
-      {/* Bottom nav */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 bg-white z-20 pb-safe"
-        style={{ boxShadow: "0 -1px 0 #E5E7EB" }}
-      >
+      {/* Bottom nav — iOS tab bar style */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md z-20 pb-safe border-t border-gray-200/60">
         <div className="max-w-lg mx-auto flex">
-          <button className="flex-1 py-3.5 flex flex-col items-center gap-1">
-            <MapPin size={21} style={{ color: "#2563EB" }} />
-            <span className="text-[11px] font-bold" style={{ color: "#2563EB" }}>Nearby</span>
+          <button className="flex-1 py-3 flex flex-col items-center gap-0.5">
+            <MapPin size={22} className="text-blue-500" />
+            <span className="text-[10px] font-semibold text-blue-500">Nearby</span>
           </button>
-          <button className="flex-1 py-3.5 flex flex-col items-center gap-1">
-            <Search size={21} className="text-gray-300" />
-            <span className="text-[11px] text-gray-400">Search</span>
+          <button className="flex-1 py-3 flex flex-col items-center gap-0.5">
+            <Search size={22} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400">Search</span>
           </button>
-          <button className="flex-1 py-3.5 flex flex-col items-center gap-1">
-            <Sparkles size={21} className="text-gray-300" />
-            <span className="text-[11px] text-gray-400">Pro</span>
+          <button className="flex-1 py-3 flex flex-col items-center gap-0.5">
+            <Sparkles size={22} className="text-gray-400" />
+            <span className="text-[10px] text-gray-400">Pro</span>
           </button>
         </div>
       </nav>
