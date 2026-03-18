@@ -11,6 +11,11 @@ const FIELD_MASK = [
   "places.businessStatus",
   "places.types",
   "places.photos",
+  "places.rating",
+  "places.userRatingCount",
+  "places.priceLevel",
+  "places.websiteUri",
+  "places.nationalPhoneNumber",
 ].join(",");
 
 export async function POST(req: NextRequest) {
