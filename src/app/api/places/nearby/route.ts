@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       const err = await res.text();
       console.error("Places API error:", err);
-      return NextResponse.json({ error: "Places API error" }, { status: 500 });
+      return NextResponse.json({ error: "Places API error", detail: err }, { status: 500 });
     }
 
     const data = await res.json();
