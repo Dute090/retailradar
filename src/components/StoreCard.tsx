@@ -85,17 +85,17 @@ export function StoreCard({ place }: StoreCardProps) {
     >
       {/* Brand color strip + logo */}
       <div
-        className="w-20 flex-shrink-0 flex flex-col items-center justify-center gap-1 py-4"
+        className="w-24 flex-shrink-0 flex flex-col items-center justify-center gap-1.5 py-5"
         style={{ backgroundColor: brand.bg }}
       >
-        <span className="text-3xl">{brand.emoji}</span>
+        <span className="text-4xl">{brand.emoji}</span>
         <span className="text-white text-[11px] font-bold tracking-wide opacity-90">
           {getBrandInitials(place.displayName.text)}
         </span>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 px-4 py-4 min-w-0">
+      <div className="flex-1 px-4 py-5 min-w-0">
         {/* Store name + status badge */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-bold text-[#111827] leading-tight" style={{ fontSize: 18 }}>
@@ -131,9 +131,9 @@ export function StoreCard({ place }: StoreCardProps) {
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 inline-flex items-center gap-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-2xl transition-colors"
+          className="mt-4 inline-flex items-center gap-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-2xl transition-colors"
         >
-          <Navigation size={14} />
+          <Navigation size={15} />
           Directions
         </a>
       </div>
