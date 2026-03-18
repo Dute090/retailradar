@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = {
-      includedTypes: ["supermarket", "grocery_or_supermarket", "department_store"],
+      includedTypes: ["supermarket", "department_store", "grocery_store"],
       maxResultCount: 20,
       locationRestriction: {
         circle: {
