@@ -3,46 +3,45 @@
 import { Place } from "@/lib/types";
 import { formatDistance } from "@/lib/utils";
 import { MapPin, Clock, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 interface StoreCardProps {
   place: Place;
 }
 
-// Brand config: accent color + text abbreviation for logo circle
-const BRANDS: Record<string, { color: string; label: string; textColor: string }> = {
-  walmart:       { color: "#0071CE", label: "W",   textColor: "#fff" },
-  target:        { color: "#CC0000", label: "T",   textColor: "#fff" },
-  costco:        { color: "#005DAA", label: "C",   textColor: "#fff" },
-  kroger:        { color: "#2563EB", label: "K",   textColor: "#fff" },
-  "whole foods": { color: "#00674B", label: "WF",  textColor: "#fff" },
-  aldi:          { color: "#1A3E6F", label: "A",   textColor: "#fff" },
-  "trader joe":  { color: "#B22222", label: "TJ",  textColor: "#fff" },
-  publix:        { color: "#1A7A3C", label: "P",   textColor: "#fff" },
-  "h-e-b":       { color: "#CC0000", label: "HEB", textColor: "#fff" },
-  safeway:       { color: "#CC0000", label: "S",   textColor: "#fff" },
-  macy:          { color: "#CC0000", label: "M",   textColor: "#fff" },
-  saks:          { color: "#1a1a1a", label: "SF",  textColor: "#fff" },
-  nordstrom:     { color: "#333",    label: "N",   textColor: "#fff" },
-  bloomingdale:  { color: "#555",    label: "B",   textColor: "#fff" },
-  "best buy":    { color: "#003B8E", label: "BB",  textColor: "#FFE000" },
-  cvs:           { color: "#CC0000", label: "CVS", textColor: "#fff" },
-  walgreens:     { color: "#E31837", label: "W",   textColor: "#fff" },
-  sprouts:       { color: "#4CAF50", label: "S",   textColor: "#fff" },
-  "food lion":   { color: "#E31837", label: "FL",  textColor: "#fff" },
-  wegmans:       { color: "#006341", label: "W",   textColor: "#fff" },
+const BRANDS: Record<string, { color: string; logo: string }> = {
+  walmart:       { color: "#0071CE", logo: "https://logo.clearbit.com/walmart.com" },
+  target:        { color: "#CC0000", logo: "https://logo.clearbit.com/target.com" },
+  costco:        { color: "#005DAA", logo: "https://logo.clearbit.com/costco.com" },
+  kroger:        { color: "#2563EB", logo: "https://logo.clearbit.com/kroger.com" },
+  "whole foods": { color: "#00674B", logo: "https://logo.clearbit.com/wholefoods.com" },
+  aldi:          { color: "#1A3E6F", logo: "https://logo.clearbit.com/aldi.us" },
+  "trader joe":  { color: "#B22222", logo: "https://logo.clearbit.com/traderjoes.com" },
+  publix:        { color: "#1A7A3C", logo: "https://logo.clearbit.com/publix.com" },
+  "h-e-b":       { color: "#CC0000", logo: "https://logo.clearbit.com/heb.com" },
+  safeway:       { color: "#CC0000", logo: "https://logo.clearbit.com/safeway.com" },
+  macy:          { color: "#CC0000", logo: "https://logo.clearbit.com/macys.com" },
+  saks:          { color: "#1a1a1a", logo: "https://logo.clearbit.com/saksfifthavenue.com" },
+  nordstrom:     { color: "#333",    logo: "https://logo.clearbit.com/nordstrom.com" },
+  bloomingdale:  { color: "#555",    logo: "https://logo.clearbit.com/bloomingdales.com" },
+  "best buy":    { color: "#003B8E", logo: "https://logo.clearbit.com/bestbuy.com" },
+  cvs:           { color: "#CC0000", logo: "https://logo.clearbit.com/cvs.com" },
+  walgreens:     { color: "#E31837", logo: "https://logo.clearbit.com/walgreens.com" },
+  sprouts:       { color: "#4CAF50", logo: "https://logo.clearbit.com/sprouts.com" },
+  wegmans:       { color: "#006341", logo: "https://logo.clearbit.com/wegmans.com" },
+  "food lion":   { color: "#E31837", logo: "https://logo.clearbit.com/foodlion.com" },
 };
 
 function getBrand(name: string) {
   const lower = name.toLowerCase();
   for (const [key, val] of Object.entries(BRANDS)) {
-    if (lower.includes(key)) return val;
+    if (lower.includes(key)) return { ...val, initials: name.slice(0, 2).toUpperCase() };
   }
-  // Generate a consistent color from name
   const hue = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
   return {
     color: `hsl(${hue}, 55%, 40%)`,
-    label: name.slice(0, 2).toUpperCase(),
-    textColor: "#fff",
+    logo: null,
+    initials: name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase(),
   };
 }
 
@@ -54,44 +53,19 @@ function getTodayHours(place: Place): string {
   return hours.weekdayDescriptions[idx]?.split(": ")[1] || "Hours unavailable";
 }
 
-function getStoreCategory(types: string[]): string {
-  if (types.includes("supermarket") || types.includes("grocery_store")) return "Grocery";
-  if (types.includes("department_store")) return "Department Store";
-  if (types.includes("convenience_store")) return "Convenience";
-  if (types.includes("drugstore") || types.includes("pharmacy")) return "Pharmacy";
-  return "Retail";
-}
-
 export function StoreCard({ place }: StoreCardProps) {
   const isOpen = place.currentOpeningHours?.openNow ?? place.regularOpeningHours?.openNow;
   const isOperational = place.businessStatus === "OPERATIONAL";
   const brand = getBrand(place.displayName.text);
   const hoursText = getTodayHours(place);
-  const category = getStoreCategory(place.types || []);
 
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
     place.formattedAddress
   )}&destination_place_id=${place.id}`;
 
-  const statusDot = !isOperational
-    ? "bg-gray-300"
-    : isOpen === true
-    ? "bg-emerald-500"
-    : "bg-gray-300";
-
-  const statusLabel = !isOperational
-    ? "Permanently closed"
-    : isOpen === true
-    ? "Open now"
-    : isOpen === false
-    ? "Closed"
-    : "Hours unknown";
-
-  const statusColor = !isOperational
-    ? "text-gray-400"
-    : isOpen === true
-    ? "text-emerald-600"
-    : "text-gray-400";
+  const statusDot = !isOperational ? "bg-gray-300" : isOpen === true ? "bg-emerald-500" : "bg-gray-300";
+  const statusLabel = !isOperational ? "Permanently closed" : isOpen === true ? "Open now" : isOpen === false ? "Closed" : "Hours unknown";
+  const statusColor = isOpen === true && isOperational ? "text-emerald-600" : "text-gray-400";
 
   return (
     <a
@@ -99,65 +73,73 @@ export function StoreCard({ place }: StoreCardProps) {
       target="_blank"
       rel="noopener noreferrer"
       className="block bg-white rounded-2xl overflow-hidden active:scale-[0.985] transition-transform"
-      style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05)" }}
+      style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04)" }}
     >
       {/* Accent top bar */}
       <div className="h-1 w-full" style={{ backgroundColor: brand.color }} />
 
-      <div className="p-4 flex gap-4 items-start">
-        {/* Brand logo circle */}
+      <div className="p-4 flex gap-3.5 items-start">
+        {/* Brand logo */}
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-lg font-black tracking-tight shadow-sm"
-          style={{ backgroundColor: brand.color, color: brand.textColor }}
+          className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden"
+          style={{ backgroundColor: brand.logo ? "#fff" : brand.color, border: brand.logo ? "1.5px solid #F0F0F0" : "none" }}
         >
-          {brand.label}
+          {brand.logo ? (
+            <Image
+              src={brand.logo}
+              alt={place.displayName.text}
+              width={40}
+              height={40}
+              className="object-contain"
+              onError={(e) => {
+                // fallback to initials on error
+                const target = e.currentTarget as HTMLImageElement;
+                target.style.display = "none";
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.style.backgroundColor = brand.color;
+                  parent.style.border = "none";
+                  parent.innerHTML = `<span style="color:#fff;font-weight:800;font-size:16px">${brand.initials}</span>`;
+                }
+              }}
+            />
+          ) : (
+            <span className="text-white font-black text-base">{brand.initials}</span>
+          )}
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Category pill */}
-          <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-            {category}
-          </span>
-
           {/* Store name */}
-          <h3 className="font-bold text-gray-900 mt-0.5 leading-snug" style={{ fontSize: 17 }}>
+          <h3 className="font-bold text-gray-900 leading-snug" style={{ fontSize: 17 }}>
             {place.displayName.text}
           </h3>
 
-          {/* Status + hours */}
-          <div className="flex items-center gap-1.5 mt-2">
+          {/* Status */}
+          <div className="flex items-center gap-1.5 mt-1.5">
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot}`} />
             <span className={`text-sm font-semibold ${statusColor}`}>{statusLabel}</span>
-            {isOpen === true && (
-              <span className="text-sm text-gray-400">· {hoursText}</span>
-            )}
           </div>
 
-          {isOpen === false && (
-            <p className="text-sm text-gray-400 mt-0.5">{hoursText}</p>
-          )}
+          {/* Hours */}
+          <div className="flex items-center gap-1.5 mt-1">
+            <Clock size={12} className="text-gray-300 flex-shrink-0" />
+            <span className="text-sm text-gray-500">{hoursText}</span>
+          </div>
 
           {/* Address + distance */}
-          <div className="flex items-start gap-1.5 mt-2">
-            <MapPin size={13} className="text-gray-300 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-gray-500 leading-snug">
+          <div className="flex items-start gap-1.5 mt-1">
+            <MapPin size={12} className="text-gray-300 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-gray-400 leading-snug">
               {place.formattedAddress}
+              {place.distance !== undefined && (
+                <span className="font-semibold text-gray-600 ml-1">· {formatDistance(place.distance)}</span>
+              )}
             </p>
           </div>
-
-          {place.distance !== undefined && (
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <Clock size={13} className="text-gray-300 flex-shrink-0" />
-              <span className="text-sm font-semibold text-gray-600">
-                {formatDistance(place.distance)} away
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Chevron */}
-        <ChevronRight size={18} className="text-gray-300 flex-shrink-0 mt-1" />
+        <ChevronRight size={17} className="text-gray-300 flex-shrink-0 mt-1" />
       </div>
     </a>
   );
