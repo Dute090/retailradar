@@ -1,44 +1,49 @@
 "use client";
 
 import { Place } from "@/lib/types";
-import { cn, formatDistance } from "@/lib/utils";
-import { Navigation } from "lucide-react";
+import { formatDistance } from "@/lib/utils";
+import { MapPin, Clock, ChevronRight } from "lucide-react";
 
 interface StoreCardProps {
   place: Place;
 }
 
-const BRAND_CONFIG: Record<string, { bg: string; emoji: string }> = {
-  walmart:       { bg: "#0071CE", emoji: "🛒" },
-  target:        { bg: "#CC0000", emoji: "🎯" },
-  costco:        { bg: "#005DAA", emoji: "📦" },
-  kroger:        { bg: "#2563EB", emoji: "🛍️" },
-  "whole foods": { bg: "#00674B", emoji: "🌿" },
-  aldi:          { bg: "#1A3E6F", emoji: "🏪" },
-  "trader joe":  { bg: "#B22222", emoji: "🌺" },
-  publix:        { bg: "#1A7A3C", emoji: "🛒" },
-  meijer:        { bg: "#CC0000", emoji: "🏬" },
-  "h-e-b":       { bg: "#CC0000", emoji: "⭐" },
-  safeway:       { bg: "#CC0000", emoji: "🛒" },
-  "macy":        { bg: "#CC0000", emoji: "🏬" },
-  saks:          { bg: "#1a1a1a", emoji: "👜" },
-  nordstrom:     { bg: "#333333", emoji: "👗" },
-  bloomingdale:  { bg: "#555555", emoji: "🛍️" },
-  "best buy":    { bg: "#003B8E", emoji: "📺" },
-  cvs:           { bg: "#CC0000", emoji: "💊" },
-  walgreens:     { bg: "#E31837", emoji: "💊" },
+// Brand config: accent color + text abbreviation for logo circle
+const BRANDS: Record<string, { color: string; label: string; textColor: string }> = {
+  walmart:       { color: "#0071CE", label: "W",   textColor: "#fff" },
+  target:        { color: "#CC0000", label: "T",   textColor: "#fff" },
+  costco:        { color: "#005DAA", label: "C",   textColor: "#fff" },
+  kroger:        { color: "#2563EB", label: "K",   textColor: "#fff" },
+  "whole foods": { color: "#00674B", label: "WF",  textColor: "#fff" },
+  aldi:          { color: "#1A3E6F", label: "A",   textColor: "#fff" },
+  "trader joe":  { color: "#B22222", label: "TJ",  textColor: "#fff" },
+  publix:        { color: "#1A7A3C", label: "P",   textColor: "#fff" },
+  "h-e-b":       { color: "#CC0000", label: "HEB", textColor: "#fff" },
+  safeway:       { color: "#CC0000", label: "S",   textColor: "#fff" },
+  macy:          { color: "#CC0000", label: "M",   textColor: "#fff" },
+  saks:          { color: "#1a1a1a", label: "SF",  textColor: "#fff" },
+  nordstrom:     { color: "#333",    label: "N",   textColor: "#fff" },
+  bloomingdale:  { color: "#555",    label: "B",   textColor: "#fff" },
+  "best buy":    { color: "#003B8E", label: "BB",  textColor: "#FFE000" },
+  cvs:           { color: "#CC0000", label: "CVS", textColor: "#fff" },
+  walgreens:     { color: "#E31837", label: "W",   textColor: "#fff" },
+  sprouts:       { color: "#4CAF50", label: "S",   textColor: "#fff" },
+  "food lion":   { color: "#E31837", label: "FL",  textColor: "#fff" },
+  wegmans:       { color: "#006341", label: "W",   textColor: "#fff" },
 };
 
-function getBrandConfig(name: string) {
+function getBrand(name: string) {
   const lower = name.toLowerCase();
-  for (const [brand, config] of Object.entries(BRAND_CONFIG)) {
-    if (lower.includes(brand)) return config;
+  for (const [key, val] of Object.entries(BRANDS)) {
+    if (lower.includes(key)) return val;
   }
-  return { bg: "#4F46E5", emoji: "🏪" };
-}
-
-function getBrandInitials(name: string): string {
-  return name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  // Generate a consistent color from name
+  const hue = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+  return {
+    color: `hsl(${hue}, 55%, 40%)`,
+    label: name.slice(0, 2).toUpperCase(),
+    textColor: "#fff",
+  };
 }
 
 function getTodayHours(place: Place): string {
@@ -46,97 +51,114 @@ function getTodayHours(place: Place): string {
   if (!hours?.weekdayDescriptions?.length) return "Hours unavailable";
   const dayIndex = new Date().getDay();
   const idx = dayIndex === 0 ? 6 : dayIndex - 1;
-  const desc = hours.weekdayDescriptions[idx] || "";
-  return desc.split(": ")[1] || "Hours unavailable";
+  return hours.weekdayDescriptions[idx]?.split(": ")[1] || "Hours unavailable";
+}
+
+function getStoreCategory(types: string[]): string {
+  if (types.includes("supermarket") || types.includes("grocery_store")) return "Grocery";
+  if (types.includes("department_store")) return "Department Store";
+  if (types.includes("convenience_store")) return "Convenience";
+  if (types.includes("drugstore") || types.includes("pharmacy")) return "Pharmacy";
+  return "Retail";
 }
 
 export function StoreCard({ place }: StoreCardProps) {
   const isOpen = place.currentOpeningHours?.openNow ?? place.regularOpeningHours?.openNow;
   const isOperational = place.businessStatus === "OPERATIONAL";
-  const brand = getBrandConfig(place.displayName.text);
+  const brand = getBrand(place.displayName.text);
   const hoursText = getTodayHours(place);
+  const category = getStoreCategory(place.types || []);
 
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
     place.formattedAddress
   )}&destination_place_id=${place.id}`;
 
-  // Status label + color
-  let statusLabel = "—";
-  let statusBg = "bg-gray-100";
-  let statusText = "text-gray-500";
-  if (!isOperational) {
-    statusLabel = "Permanently Closed";
-    statusBg = "bg-gray-100";
-    statusText = "text-gray-400";
-  } else if (isOpen === true) {
-    statusLabel = "Open Now";
-    statusBg = "bg-[#16A34A]";
-    statusText = "text-white";
-  } else if (isOpen === false) {
-    statusLabel = "Closed";
-    statusBg = "bg-gray-200";
-    statusText = "text-gray-500";
-  }
+  const statusDot = !isOperational
+    ? "bg-gray-300"
+    : isOpen === true
+    ? "bg-emerald-500"
+    : "bg-gray-300";
+
+  const statusLabel = !isOperational
+    ? "Permanently closed"
+    : isOpen === true
+    ? "Open now"
+    : isOpen === false
+    ? "Closed"
+    : "Hours unknown";
+
+  const statusColor = !isOperational
+    ? "text-gray-400"
+    : isOpen === true
+    ? "text-emerald-600"
+    : "text-gray-400";
 
   return (
-    <div
-      className="bg-white rounded-2xl flex items-stretch overflow-hidden"
-      style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}
+    <a
+      href={mapsUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block bg-white rounded-2xl overflow-hidden active:scale-[0.985] transition-transform"
+      style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05)" }}
     >
-      {/* Brand color strip + logo */}
-      <div
-        className="w-24 flex-shrink-0 flex flex-col items-center justify-center gap-1.5 py-5"
-        style={{ backgroundColor: brand.bg }}
-      >
-        <span className="text-4xl">{brand.emoji}</span>
-        <span className="text-white text-[11px] font-bold tracking-wide opacity-90">
-          {getBrandInitials(place.displayName.text)}
-        </span>
-      </div>
+      {/* Accent top bar */}
+      <div className="h-1 w-full" style={{ backgroundColor: brand.color }} />
 
-      {/* Main content */}
-      <div className="flex-1 px-4 py-5 min-w-0">
-        {/* Store name */}
-        <h3 className="font-bold text-[#111827] leading-tight pr-1" style={{ fontSize: 18 }}>
-          {place.displayName.text}
-        </h3>
-
-        {/* Status badge — own line */}
-        <span
-          className={cn(
-            "inline-block text-xs font-bold px-3 py-1 rounded-full mt-2",
-            statusBg, statusText
-          )}
+      <div className="p-4 flex gap-4 items-start">
+        {/* Brand logo circle */}
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-lg font-black tracking-tight shadow-sm"
+          style={{ backgroundColor: brand.color, color: brand.textColor }}
         >
-          {statusLabel}
-        </span>
+          {brand.label}
+        </div>
 
-        {/* Hours — big, readable */}
-        <p className="text-[#111827] font-medium mt-2" style={{ fontSize: 16 }}>
-          {hoursText}
-        </p>
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          {/* Category pill */}
+          <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+            {category}
+          </span>
 
-        {/* Address + distance */}
-        <p className="text-[#6B7280] text-sm mt-1 leading-snug">
-          {place.formattedAddress}
+          {/* Store name */}
+          <h3 className="font-bold text-gray-900 mt-0.5 leading-snug" style={{ fontSize: 17 }}>
+            {place.displayName.text}
+          </h3>
+
+          {/* Status + hours */}
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot}`} />
+            <span className={`text-sm font-semibold ${statusColor}`}>{statusLabel}</span>
+            {isOpen === true && (
+              <span className="text-sm text-gray-400">· {hoursText}</span>
+            )}
+          </div>
+
+          {isOpen === false && (
+            <p className="text-sm text-gray-400 mt-0.5">{hoursText}</p>
+          )}
+
+          {/* Address + distance */}
+          <div className="flex items-start gap-1.5 mt-2">
+            <MapPin size={13} className="text-gray-300 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-gray-500 leading-snug">
+              {place.formattedAddress}
+            </p>
+          </div>
+
           {place.distance !== undefined && (
-            <span className="font-semibold text-[#111827] ml-1">
-              · {formatDistance(place.distance)}
-            </span>
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <Clock size={13} className="text-gray-300 flex-shrink-0" />
+              <span className="text-sm font-semibold text-gray-600">
+                {formatDistance(place.distance)} away
+              </span>
+            </div>
           )}
-        </p>
+        </div>
 
-        {/* Navigate button */}
-        <a
-          href={mapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 bg-[#2563EB] hover:bg-blue-700 text-white text-sm font-bold px-5 py-2.5 rounded-2xl transition-colors"
-        >
-          <Navigation size={15} />
-          Directions
-        </a>
+        {/* Chevron */}
+        <ChevronRight size={18} className="text-gray-300 flex-shrink-0 mt-1" />
       </div>
-    </div>
+    </a>
   );
 }
