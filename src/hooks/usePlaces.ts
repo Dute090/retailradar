@@ -19,7 +19,7 @@ export function usePlaces() {
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number; city?: string } | null>(null);
 
-  const fetchPlaces = async (lat: number, lng: number) => {
+  const fetchPlaces = async (lat: number, lng: number, isDemo = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -31,7 +31,17 @@ export function usePlaces() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch");
 
-      const withDistance = (data.places || []).map((p: Place) => ({
+      const places: Place[] = data.places || [];
+
+      // If no results (e.g. user in China where Google Places has no coverage),
+      // fall back to New York City demo data so the UI is still visible
+      if (places.length === 0 && !isDemo) {
+        setLocation({ lat: 40.7128, lng: -74.006, city: "New York, NY (demo)" });
+        fetchPlaces(40.7128, -74.006, true);
+        return;
+      }
+
+      const withDistance = places.map((p: Place) => ({
         ...p,
         distance: getDistanceMeters(lat, lng, p.location.latitude, p.location.longitude),
       }));
