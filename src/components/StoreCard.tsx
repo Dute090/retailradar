@@ -96,28 +96,28 @@ export function StoreCard({ place }: StoreCardProps) {
 
       {/* Main content */}
       <div className="flex-1 px-4 py-5 min-w-0">
-        {/* Store name + status badge */}
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="font-bold text-[#111827] leading-tight" style={{ fontSize: 18 }}>
-            {place.displayName.text}
-          </h3>
-          <span
-            className={cn(
-              "flex-shrink-0 text-xs font-bold px-3 py-1 rounded-full mt-0.5",
-              statusBg, statusText
-            )}
-          >
-            {statusLabel}
-          </span>
-        </div>
+        {/* Store name */}
+        <h3 className="font-bold text-[#111827] leading-tight pr-1" style={{ fontSize: 18 }}>
+          {place.displayName.text}
+        </h3>
+
+        {/* Status badge — own line */}
+        <span
+          className={cn(
+            "inline-block text-xs font-bold px-3 py-1 rounded-full mt-2",
+            statusBg, statusText
+          )}
+        >
+          {statusLabel}
+        </span>
 
         {/* Hours — big, readable */}
-        <p className="text-[#111827] font-medium mb-1" style={{ fontSize: 16 }}>
+        <p className="text-[#111827] font-medium mt-2" style={{ fontSize: 16 }}>
           {hoursText}
         </p>
 
         {/* Address + distance */}
-        <p className="text-[#6B7280] text-sm truncate">
+        <p className="text-[#6B7280] text-sm mt-1 leading-snug">
           {place.formattedAddress}
           {place.distance !== undefined && (
             <span className="font-semibold text-[#111827] ml-1">
