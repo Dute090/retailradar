@@ -2,5 +2,5 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "installCommand": "npm install -g npm@10 && npm install"
+  "installCommand": "corepack enable && pnpm install"
 }
