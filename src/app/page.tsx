@@ -85,14 +85,14 @@ export default function Home() {
               placeholder="Search stores nearby..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-[#F0F4FF] border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
+              className="w-full pl-9 pr-4 py-3 bg-[#F0F4FF] border border-gray-200 rounded-2xl text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
             />
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-lg mx-auto px-4 py-4 space-y-3 pb-32">
+      <main className="max-w-lg mx-auto px-4 py-5 space-y-4 pb-32">
 
         {/* Loading skeletons */}
         {loading && (
