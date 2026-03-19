@@ -20,6 +20,18 @@ export function usePlaces() {
   const [location, setLocation] = useState<{ lat: number; lng: number; city?: string } | null>(null);
 
   const fetchPlaces = async (lat: number, lng: number, isDemo = false) => {
+    // Cache results for 1 hour to avoid redundant API calls
+    const cacheKey = `places_${lat.toFixed(3)}_${lng.toFixed(3)}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      const { data, ts } = JSON.parse(cached);
+      if (Date.now() - ts < 3600000) {
+        setPlaces(data);
+        setLoading(false);
+        return;
+      }
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -46,6 +58,7 @@ export function usePlaces() {
         distance: getDistanceMeters(lat, lng, p.location.latitude, p.location.longitude),
       }));
       withDistance.sort((a: Place, b: Place) => (a.distance ?? 0) - (b.distance ?? 0));
+      sessionStorage.setItem(cacheKey, JSON.stringify({ data: withDistance, ts: Date.now() }));
       setPlaces(withDistance);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Unknown error");
