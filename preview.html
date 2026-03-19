@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RetailRadar — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', -apple-system, sans-serif; background: #F2F2F7; min-height: 100vh; }
+
+/* Header */
+.header { background: #F2F2F7; position: sticky; top: 0; z-index: 20; padding: 20px 16px 12px; }
+.header-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; }
+.title { font-size: 28px; font-weight: 800; color: #1C1C1E; letter-spacing: -0.5px; }
+.location-row { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+.location-dot { width: 8px; height: 8px; border-radius: 50%; background: #007AFF; }
+.location-text { font-size: 13px; color: #8E8E93; }
+.open-badge { font-size: 12px; font-weight: 600; color: #34C759; background: #E8F8EC; padding: 2px 8px; border-radius: 20px; margin-left: 4px; }
+.refresh-btn { width: 34px; height: 34px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+/* Search */
+.search-wrap { position: relative; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #8E8E93; }
+.search-input { width: 100%; padding: 10px 12px 10px 36px; background: white; border: 1px solid #E5E5EA; border-radius: 12px; font-size: 15px; font-family: inherit; color: #1C1C1E; outline: none; }
+.search-input::placeholder { color: #8E8E93; }
+
+/* Main */
+.main { padding: 8px 16px 100px; }
+.section-label { font-size: 12px; font-weight: 600; color: #8E8E93; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 4px; margin-bottom: 8px; }
+
+/* Card group */
+.card-group { background: white; border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); }
+.store-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-decoration: none; color: inherit; transition: background 0.15s; }
+.store-row:active { background: #F2F2F7; }
+.divider { height: 1px; background: #F2F2F7; margin-left: 72px; }
+
+/* Logo */
+.logo-wrap { width: 48px; height: 48px; border-radius: 12px; background: #F2F2F7; border: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+.logo-wrap img { width: 32px; height: 32px; object-fit: contain; }
+.logo-initials { font-size: 14px; font-weight: 800; color: white; }
+
+/* Store info */
+.store-info { flex: 1; min-width: 0; }
+.store-name { font-size: 15px; font-weight: 600; color: #1C1C1E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-row { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.open { background: #34C759; }
+.status-dot.closed { background: #C7C7CC; }
+.status-text { font-size: 13px; font-weight: 500; }
+.status-text.open { color: #34C759; }
+.status-text.closed { color: #8E8E93; }
+.status-sep { color: #C7C7CC; font-size: 13px; }
+.hours-text { font-size: 13px; color: #8E8E93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.addr-row { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.addr-text { font-size: 12px; color: #8E8E93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dist-text { font-size: 12px; font-weight: 600; color: #3C3C43; flex-shrink: 0; }
+
+/* Chevron */
+.chevron { color: #C7C7CC; flex-shrink: 0; }
+
+/* Pro card */
+.pro-card { background: white; border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); padding: 16px; margin-top: 16px; }
+.pro-inner { display: flex; gap: 14px; align-items: flex-start; }
+.pro-icon { width: 48px; height: 48px; border-radius: 12px; background: #EEF3FF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; }
+.pro-title { font-size: 15px; font-weight: 600; color: #1C1C1E; }
+.pro-desc { font-size: 13px; color: #8E8E93; margin-top: 3px; line-height: 1.5; }
+.pro-btn { width: 100%; margin-top: 14px; background: #007AFF; color: white; border: none; border-radius: 12px; padding: 13px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+
+/* Bottom nav */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.1); display: flex; padding-bottom: env(safe-area-inset-bottom, 0); }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0; border: none; background: none; cursor: pointer; font-family: inherit; }
+.nav-label { font-size: 10px; font-weight: 500; }
+.nav-item.active .nav-label { color: #007AFF; }
+.nav-item.active svg { color: #007AFF; }
+.nav-item:not(.active) .nav-label { color: #8E8E93; }
+.nav-item:not(.active) svg { color: #8E8E93; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-top">
+    <div>
+      <div class="title">Nearby Stores</div>
+      <div class="location-row">
+        <div class="location-dot"></div>
+        <span class="location-text">New York, NY</span>
+        <span class="open-badge">12 open</span>
+      </div>
+    </div>
+    <button class="refresh-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
+  </div>
+  <div class="search-wrap">
+    <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" type="text" placeholder="Search">
+  </div>
+</header>
+
+<main class="main">
+  <p class="section-label">20 stores nearby</p>
+
+  <div class="card-group">
+
+    <!-- Macy's -->
+    <a class="store-row" href="#">
+      <div class="logo-wrap" style="background:#fff">
+        <img src="https://logo.clearbit.com/macys.com" onerror="this.parentElement.style.background='#CC0000';this.outerHTML='<span class=logo-initials>M</span>'" alt="Macy's">
+      </div>
+      <div class="store-info">
+        <div class="store-name">Macy's</div>
+        <div class="status-row">
+          <span class="status-dot open"></span>
+          <span class="status-text open">Open</span>
+          <span class="status-sep">·</span>
+          <span class="hours-text">10:00 AM – 9:00 PM</span>
+        </div>
+        <div class="addr-row">
+          <span class="addr-text">151 W 34th St, New York</span>
+          <span class="dist-text">· 0.8 km</span>
+        </div>
+      </div>
+      <svg class="chevron" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="divider"></div>
+
+    <!-- Saks -->
+    <a class="store-row" href="#">
+      <div class="logo-wrap" style="background:#fff">
+        <img src="https://logo.clearbit.com/saksfifthavenue.com" onerror="this.parentElement.style.background='#1a1a1a';this.outerHTML='<span class=logo-initials>SF</span>'" alt="Saks">
+      </div>
+      <div class="store-info">
+        <div class="store-name">Saks Fifth Avenue</div>
+        <div class="status-row">
+          <span class="status-dot open"></span>
+          <span class="status-text open">Open</span>
+          <span class="status-sep">·</span>
+          <span class="hours-text">10:00 AM – 8:00 PM</span>
+        </div>
+        <div class="addr-row">
+          <span class="addr-text">611 5th Ave, New York</span>
+          <span class="dist-text">· 1.2 km</span>
+        </div>
+      </div>
+      <svg class="chevron" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="divider"></div>
+
+    <!-- Costco -->
+    <a class="store-row" href="#">
+      <div class="logo-wrap" style="background:#fff">
+        <img src="https://logo.clearbit.com/costco.com" onerror="this.parentElement.style.background='#005DAA';this.outerHTML='<span class=logo-initials>C</span>'" alt="Costco">
+      </div>
+      <div class="store-info">
+        <div class="store-name">Costco Wholesale</div>
+        <div class="status-row">
+          <span class="status-dot open"></span>
+          <span class="status-text open">Open</span>
+          <span class="status-sep">·</span>
+          <span class="hours-text">10:00 AM – 8:30 PM</span>
+        </div>
+        <div class="addr-row">
+          <span class="addr-text">976 3rd Ave, Brooklyn</span>
+          <span class="dist-text">· 2.1 km</span>
+        </div>
+      </div>
+      <svg class="chevron" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="divider"></div>
+
+    <!-- Target -->
+    <a class="store-row" href="#">
+      <div class="logo-wrap" style="background:#fff">
+        <img src="https://logo.clearbit.com/target.com" onerror="this.parentElement.style.background='#CC0000';this.outerHTML='<span class=logo-initials>T</span>'" alt="Target">
+      </div>
+      <div class="store-info">
+        <div class="store-name">Target</div>
+        <div class="status-row">
+          <span class="status-dot open"></span>
+          <span class="status-text open">Open</span>
+          <span class="status-sep">·</span>
+          <span class="hours-text">8:00 AM – 10:00 PM</span>
+        </div>
+        <div class="addr-row">
+          <span class="addr-text">237 W 42nd St, New York</span>
+          <span class="dist-text">· 1.5 km</span>
+        </div>
+      </div>
+      <svg class="chevron" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="divider"></div>
+
+    <!-- Whole Foods -->
+    <a class="store-row" href="#">
+      <div class="logo-wrap" style="background:#fff">
+        <img src="https://logo.clearbit.com/wholefoods.com" onerror="this.parentElement.style.background='#00674B';this.outerHTML='<span class=logo-initials>WF</span>'" alt="Whole Foods">
+      </div>
+      <div class="store-info">
+        <div class="store-name">Whole Foods Market</div>
+        <div class="status-row">
+          <span class="status-dot closed"></span>
+          <span class="status-text closed">Closed</span>
+          <span class="status-sep">·</span>
+          <span class="hours-text">Opens 8:00 AM</span>
+        </div>
+        <div class="addr-row">
+          <span class="addr-text">10 Columbus Circle, New York</span>
+          <span class="dist-text">· 1.8 km</span>
+        </div>
+      </div>
+      <svg class="chevron" width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+
+  </div>
+
+  <!-- Pro upsell -->
+  <div class="pro-card">
+    <div class="pro-inner">
+      <div class="pro-icon">✨</div>
+      <div>
+        <div class="pro-title">10 more stores nearby</div>
+        <div class="pro-desc">Unlock all stores, open-now filter, favorites & holiday alerts.</div>
+      </div>
+    </div>
+    <button class="pro-btn">Upgrade to Pro · $2.99/mo</button>
+  </div>
+</main>
+
+<!-- Bottom nav -->
+<nav class="bottom-nav">
+  <button class="nav-item active">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span class="nav-label">Nearby</span>
+  </button>
+  <button class="nav-item">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span class="nav-label">Search</span>
+  </button>
+  <button class="nav-item">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span class="nav-label">Pro</span>
+  </button>
+</nav>
+
+</body>
+</html>
